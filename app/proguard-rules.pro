@@ -1,0 +1,2 @@
+-keep class com.voltbill.pro.data.** { *; }
+-dontwarn kotlinx.**
