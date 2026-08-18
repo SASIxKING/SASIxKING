@@ -1,0 +1,18 @@
+This is the billing and inventory system for C.R.S Power Solution, an inverter
+and battery dealership at No.16, ECR Main Road, Pillaichavady, Pondicherry-605014.
+
+House rules when editing this project:
+
+- Money: never use raw floats for tax. Use the helpers in src/lib/gst.js, which
+  compute in paise and round half-up. All amounts are Indian Rupees (₹) and are
+  displayed with Indian digit grouping (1,23,456.78).
+- GST: only two slabs are valid — 18% (inverters, solar, stabilizers,
+  accessories, services) and 28% (lead-acid batteries, HSN 8507). Puducherry is
+  state code 34: same-state customers get CGST+SGST, everyone else gets IGST.
+- Security: GST rates and payment amounts are always recomputed on the server
+  from the stored product/invoice records. Never trust a price, tax rate or
+  amount sent by the browser. Gateway secrets stay server-side.
+- Persistence is a JSON file (.data/db.json) because WebContainer cannot compile
+  native modules like better-sqlite3.
+- Run `npm test` after changing anything in src/lib — the money and analytics
+  maths is covered by 25 unit tests.

@@ -1,0 +1,6 @@
+{
+  "template": "node",
+  "startCommand": "npm run dev",
+  "installCommand": "npm install",
+  "previewPort": 5173
+}
