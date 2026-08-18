@@ -49,21 +49,16 @@ fun SettingsScreen(vm: AppViewModel) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(Modifier.padding(14.dp)) {
-                    LabeledField("Business name", draft.name) { draft = draft.copy(name = it) }
-                    LabeledField("Tagline", draft.tagline) { draft = draft.copy(tagline = it) }
-                    LabeledField("GSTIN", draft.gstin) { draft = draft.copy(gstin = it) }
-                    LabeledField("Phone", draft.phone) { draft = draft.copy(phone = it) }
-                    LabeledField("Email", draft.email) { draft = draft.copy(email = it) }
-                    LabeledField("Address", draft.address, singleLine = false) {
-                        draft = draft.copy(address = it)
-                    }
+                    LabeledField("Business name", draft.name, { draft = draft.copy(name = it) })
+                    LabeledField("Tagline", draft.tagline, { draft = draft.copy(tagline = it) })
+                    LabeledField("GSTIN", draft.gstin, { draft = draft.copy(gstin = it) })
+                    LabeledField("Phone", draft.phone, { draft = draft.copy(phone = it) })
+                    LabeledField("Email", draft.email, { draft = draft.copy(email = it) })
+                    LabeledField("Address", draft.address, { draft = draft.copy(address = it) }, singleLine = false)
                     Row {
-                        LabeledField("State", draft.state, modifier = Modifier.weight(2f)) {
-                            draft = draft.copy(state = it)
-                        }
+                        LabeledField("State", draft.state, { draft = draft.copy(state = it) }, modifier = Modifier.weight(2f))
                         Spacer(Modifier.width(8.dp))
-                        LabeledField("Code", draft.stateCode, modifier = Modifier.weight(1f),
-                            numeric = true) { draft = draft.copy(stateCode = it) }
+                        LabeledField("Code", draft.stateCode, { draft = draft.copy(stateCode = it) }, modifier = Modifier.weight(1f), numeric = true)
                     }
                 }
             }
@@ -76,23 +71,15 @@ fun SettingsScreen(vm: AppViewModel) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(Modifier.padding(14.dp)) {
-                    LabeledField("Invoice prefix", draft.invoicePrefix) {
-                        draft = draft.copy(invoicePrefix = it)
-                    }
+                    LabeledField("Invoice prefix", draft.invoicePrefix, { draft = draft.copy(invoicePrefix = it) })
                     Text(
                         "Bills are numbered ${draft.invoicePrefix}/2025-26/0001 and reset each financial year.",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    LabeledField("Default GST %", draft.defaultGst, numeric = true) {
-                        draft = draft.copy(defaultGst = it)
-                    }
-                    LabeledField("Authorised signatory", draft.signatory) {
-                        draft = draft.copy(signatory = it)
-                    }
-                    LabeledField("Terms & conditions", draft.terms, singleLine = false) {
-                        draft = draft.copy(terms = it)
-                    }
+                    LabeledField("Default GST %", draft.defaultGst, { draft = draft.copy(defaultGst = it) }, numeric = true)
+                    LabeledField("Authorised signatory", draft.signatory, { draft = draft.copy(signatory = it) })
+                    LabeledField("Terms & conditions", draft.terms, { draft = draft.copy(terms = it) }, singleLine = false)
                 }
             }
         }
@@ -104,12 +91,10 @@ fun SettingsScreen(vm: AppViewModel) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(Modifier.padding(14.dp)) {
-                    LabeledField("Bank name", draft.bankName) { draft = draft.copy(bankName = it) }
-                    LabeledField("Account number", draft.accountNo) {
-                        draft = draft.copy(accountNo = it)
-                    }
-                    LabeledField("IFSC", draft.ifsc) { draft = draft.copy(ifsc = it) }
-                    LabeledField("UPI ID", draft.upiId) { draft = draft.copy(upiId = it) }
+                    LabeledField("Bank name", draft.bankName, { draft = draft.copy(bankName = it) })
+                    LabeledField("Account number", draft.accountNo, { draft = draft.copy(accountNo = it) })
+                    LabeledField("IFSC", draft.ifsc, { draft = draft.copy(ifsc = it) })
+                    LabeledField("UPI ID", draft.upiId, { draft = draft.copy(upiId = it) })
                 }
             }
         }
