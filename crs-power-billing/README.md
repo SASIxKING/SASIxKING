@@ -3,32 +3,60 @@
 Billing, inventory and GST software for **C.R.S Power Solution**
 No.16, ECR Main Road, Pillaichavady, Pondicherry – 605014.
 
-Built to run in **[bolt.diy](https://github.com/stackblitz-labs/bolt.diy)** (browser
-WebContainer) as well as any normal Node 18+ machine. React + Vite on the front,
-Express on the back, JSON file storage — no native modules, no database server,
-nothing to install beyond `npm install`.
+Runs as **three applications from one codebase**:
+
+| Platform | How it runs | Data |
+|---|---|---|
+| **Web** | React app + Express API | on the server |
+| **Android** (APK) | Capacitor WebView, fully offline | on the device |
+| **Windows** (.exe) | Electron desktop app, fully offline | on the PC |
+
+The Android and Windows builds need **no server and no internet**. They embed the
+same business core the API uses, so an invoice created offline on a shop tablet is
+validated exactly as strictly as one created through the web API.
 
 ---
 
-## Quick start
+## Quick start (web)
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open **http://localhost:5173**. That single command runs both the API (port 8787)
-and the web app (port 5173); Vite proxies `/api` to the API, so the browser only
-ever calls relative URLs.
+Open **http://localhost:5173**. One command runs the API (8787) and the web app
+(5173); Vite proxies `/api`, so the browser only uses relative URLs.
 
 ```bash
-npm test          # 25 unit tests over the money + analytics maths
-npm run build     # production bundle into dist/
+npm test          # 43 unit tests over the money, inventory and analytics rules
+npm run build     # production web bundle
 ```
 
-The app seeds itself on first run with the real product catalogue, 5 customers
-and ~6 months of invoice history, so the trend dashboards are meaningful
-immediately. `POST /api/reset` restores that starting state.
+## Building the Android APK and Windows installer
+
+```bash
+./build-apps.sh --ci        # build BOTH on GitHub Actions — nothing to install
+./build-apps.sh android     # APK locally      (needs JDK 17 + Android SDK)
+./build-apps.sh windows     # .exe — must run ON Windows (or Linux + wine)
+```
+
+`--ci` copies `ci/build-apps.yml` into `.github/workflows/`, commits and pushes.
+The run produces two downloadable artifacts:
+
+- **CRS-Power-Billing-Android** → `app-release.apk` (signed, sideloadable)
+- **CRS-Power-Billing-Windows** → `CRS-Power-Billing-Setup-1.0.0.exe` plus a
+  portable `.exe` that runs from a pen drive with no installation
+
+> The workflow lives in `ci/` rather than `.github/workflows/` because the
+> automation account that created this branch is not allowed to write there.
+> You can also just create the file by hand in the GitHub web UI.
+
+### Desktop development
+
+```bash
+npm run desktop:dev     # Electron pointed at the Vite dev server, with hot reload
+npm run android:open    # opens the generated project in Android Studio
+```
 
 ---
 
@@ -142,11 +170,46 @@ at ~72 kB gzipped and avoids dependencies that struggle in WebContainer.
 
 ---
 
+## How one codebase serves three platforms
+
+```
+src/core/service.js     ← every business rule lives here, once
+      │
+      ├── server/index.js   Express wraps it        → Web
+      └── src/api.js        called in-process       → Android + Windows
+```
+
+`src/core/service.js` owns GST slabs, stock checks, payment limits and invoice
+numbering. The web API is a thin HTTP layer over it; the packaged apps call it
+directly against device storage through the same `read()/write()` adapter
+interface (`src/core/storage.js`).
+
+This matters for correctness: **if the rules were duplicated, the offline app
+would drift and become the weak link.** A parity test runs identical hostile
+payloads through both paths and asserts byte-identical responses — it has
+already caught a real bug (a 500% discount produced a negative invoice).
+
+The build target is selected at compile time, and the two bundles are mutually
+exclusive: the embedded build contains **zero** `/api` calls, and the web build
+contains none of the offline storage code.
+
 ## Notes & limitations
 
-- Storage is a JSON file (`.data/db.json`). Fine for a single shop counter;
-  move to Postgres/SQLite if you need multiple simultaneous terminals.
-- There is **no authentication yet** — anyone who can reach the URL can bill.
-  Add a login before exposing this beyond your local network.
-- "Print / PDF" uses the browser's print dialog (Save as PDF), which keeps the
-  invoice pixel-identical to what you see on screen.
+- **Each install is independent.** The Android tablet, the Windows PC and the
+  web server each keep their own data — there is no sync between them. Use
+  **Backup ▸ Save backup file** to move data across, and pick one device as the
+  book of record. Multi-device sync would need a shared hosted database.
+- **Take backups.** On the packaged apps the data lives only on that device, so
+  a lost or wiped device means lost invoices. The Backup screen says this plainly
+  and Windows has File ▸ Backup (Ctrl+S).
+- **Online payment collection needs the hosted version.** Razorpay/Cashfree/PayU
+  confirmations are verified with a server-side secret; a packaged app has no
+  safe place to keep one, so it would be security theatre. The offline apps
+  record Cash/UPI/Card receipts manually instead, and the "Collect online"
+  button is hidden there rather than failing mysteriously.
+- **No authentication yet** — anyone who can open the app can bill. Add a login
+  before putting the web version on a public network.
+- Storage is JSON (file on the server, localStorage on device). Fine for a single
+  counter; move to Postgres/SQLite for many simultaneous terminals.
+- "Print / PDF" uses the system print dialog (Save as PDF), keeping the invoice
+  pixel-identical to the screen.

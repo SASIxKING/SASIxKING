@@ -3,3 +3,12 @@ dist
 .data
 .env
 *.log
+release/
+dist-apk/
+keystore/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/app/src/main/assets/public/
+android/capacitor-cordova-android-plugins/

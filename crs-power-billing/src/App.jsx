@@ -1,6 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { NavLink, Route, Routes, Link, useLocation } from 'react-router-dom';
-import { api } from './api.js';
+import { NavLink, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
+import { api, IS_EMBEDDED } from './api.js';
+import {
+  onDesktopNavigate,
+  onDesktopBackupRequest,
+  onDesktopRestore,
+  saveBackupFile,
+  platformLabel,
+} from './platform.js';
 import { Spinner, ErrorBanner, Toast } from './components/ui.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Invoices from './pages/Invoices.jsx';
@@ -9,6 +16,7 @@ import NewInvoice from './pages/NewInvoice.jsx';
 import Customers from './pages/Customers.jsx';
 import Inventory from './pages/Inventory.jsx';
 import Reports from './pages/Reports.jsx';
+import Backup from './pages/Backup.jsx';
 
 const NAV = [
   { to: '/', label: 'Dashboard', end: true },
@@ -16,6 +24,7 @@ const NAV = [
   { to: '/customers', label: 'Customers' },
   { to: '/inventory', label: 'Inventory' },
   { to: '/reports', label: 'GST Reports' },
+  { to: '/backup', label: 'Backup' },
 ];
 
 export default function App() {
@@ -24,6 +33,7 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const load = useCallback(async () => {
     try {
@@ -42,6 +52,30 @@ export default function App() {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
   }, []);
+
+  // Windows menu bar -> React router / backup actions
+  useEffect(() => {
+    const offNav = onDesktopNavigate((route) => navigate(route));
+    const offBackup = onDesktopBackupRequest(async () => {
+      try {
+        const snapshot = await api.exportAll();
+        const result = await saveBackupFile(snapshot);
+        if (result.saved) notify(result.message);
+      } catch (err) {
+        notify(err.message, 'error');
+      }
+    });
+    const offRestore = onDesktopRestore(async (contents) => {
+      try {
+        const summary = await api.importAll(JSON.parse(contents));
+        await load();
+        notify(`Restored ${summary.invoices} invoices`);
+      } catch (err) {
+        notify(`Restore failed: ${err.message}`, 'error');
+      }
+    });
+    return () => { offNav(); offBackup(); offRestore(); };
+  }, [navigate, notify, load]);
 
   if (!data && error) {
     return (
@@ -94,6 +128,14 @@ export default function App() {
           </nav>
 
           <div className="ml-auto flex items-center gap-2">
+            {IS_EMBEDDED ? (
+              <span
+                className="chip hidden bg-emerald-50 text-emerald-700 sm:inline-flex"
+                title={`Runs without internet — data is stored on this ${platformLabel().toLowerCase()}`}
+              >
+                ● Offline ready
+              </span>
+            ) : null}
             <Link to="/invoices/new" className="btn-primary hidden sm:inline-flex">+ New invoice</Link>
             <button
               type="button"
@@ -137,6 +179,7 @@ export default function App() {
           <Route path="/customers" element={<Customers data={data} refresh={load} notify={notify} />} />
           <Route path="/inventory" element={<Inventory data={data} refresh={load} notify={notify} />} />
           <Route path="/reports" element={<Reports data={data} />} />
+          <Route path="/backup" element={<Backup data={data} refresh={load} notify={notify} />} />
           <Route path="*" element={<Dashboard data={data} />} />
         </Routes>
       </main>

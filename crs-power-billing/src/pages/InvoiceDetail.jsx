@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { api } from '../api.js';
+import { api, IS_EMBEDDED } from '../api.js';
 import { formatINR, money, amountInWords, hsnSummary } from '../lib/gst.js';
 import { Money, StatusChip, Modal, Field, Spinner, ErrorBanner } from '../components/ui.jsx';
 
@@ -16,7 +16,10 @@ export default function InvoiceDetail({ data, refresh, notify }) {
   const [onlineOpen, setOnlineOpen] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => { api.gateways().then(setGateways).catch(() => {}); }, []);
+  useEffect(() => {
+    if (IS_EMBEDDED) return;
+    api.gateways().then(setGateways).catch(() => {});
+  }, []);
 
   const hsnRows = useMemo(
     () => (invoice ? hsnSummary(invoice.items, invoice.interState) : []),
@@ -55,9 +58,11 @@ export default function InvoiceDetail({ data, refresh, notify }) {
               <button type="button" className="btn-ghost" onClick={() => setPayOpen(true)}>
                 Record payment
               </button>
-              <button type="button" className="btn-primary" onClick={() => setOnlineOpen(true)}>
-                Collect online
-              </button>
+              {!IS_EMBEDDED ? (
+                <button type="button" className="btn-primary" onClick={() => setOnlineOpen(true)}>
+                  Collect online
+                </button>
+              ) : null}
             </>
           ) : null}
           <button type="button" className="btn-danger" onClick={remove}>Delete</button>

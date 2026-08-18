@@ -1,0 +1,20 @@
+{
+  "appId": "in.crspower.billing",
+  "appName": "CRS Power Billing",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 600,
+      "backgroundColor": "#1b5ced",
+      "showSpinner": false
+    }
+  }
+}
