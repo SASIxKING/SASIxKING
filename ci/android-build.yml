@@ -28,8 +28,6 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.7'
 
       - name: Generate signing keystore
         run: |
@@ -42,10 +40,10 @@ jobs:
             -dname "CN=VoltBill Pro, OU=Sales, O=VoltBill, L=Puducherry, S=Puducherry, C=IN"
 
       - name: Run GST engine unit tests
-        run: gradle :app:testDebugUnitTest --no-daemon
+        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
 
       - name: Build debug APK
-        run: gradle :app:assembleDebug --no-daemon --stacktrace
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: Build release APK
         env:
@@ -53,7 +51,7 @@ jobs:
           VOLTBILL_STORE_PASSWORD: voltbill
           VOLTBILL_KEY_ALIAS: voltbill
           VOLTBILL_KEY_PASSWORD: voltbill
-        run: gradle :app:assembleRelease --no-daemon --stacktrace
+        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
 
       - name: Rename artifacts
         run: |

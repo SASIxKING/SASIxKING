@@ -10,42 +10,40 @@ without internet — no subscription, no server, no account.
 
 ## 📥 Getting the APK
 
-The build runs on GitHub Actions (this sandbox has no Android SDK).
-**The workflow file is at [`ci/android-build.yml`](ci/android-build.yml) and must be moved to
-`.github/workflows/` once** — the automation token used to create this branch is not allowed to
-write to `.github/workflows/`.
+**Fastest way — no Android SDK needed.** Clone the repo and run one command:
 
-### One-time setup (≈30 seconds)
-
-**Option A — GitHub web UI**
-1. Open this branch → **Add file ▸ Create new file**
-2. Name it `.github/workflows/android-build.yml`
-3. Paste the contents of [`ci/android-build.yml`](ci/android-build.yml) → **Commit**
-4. Go to the **Actions** tab → *Build APK* → **Run workflow** on this branch
-
-**Option B — from your machine**
 ```bash
 git clone https://github.com/SASIxKING/SASIxKING.git
-cd SASIxKING
-git checkout arena/01a015ba-sasixking
-mkdir -p .github/workflows && git mv ci/android-build.yml .github/workflows/
-git commit -am "Enable APK build workflow" && git push
+cd SASIxKING && git checkout arena/01a015ba-sasixking
+./build-apk.sh --ci
 ```
 
-Then download **VoltBillPro-APK** from the finished workflow run (Actions ▸ run ▸ *Artifacts*).
-It contains `VoltBillPro-debug.apk` and a signed `VoltBillPro-release.apk`.
+That enables the GitHub Actions build and pushes it. When the run finishes (~5 min), open
+[the Actions tab](https://github.com/SASIxKING/SASIxKING/actions), click the latest run and
+download the **VoltBillPro-APK** artifact — it contains the installable
+`VoltBillPro-release.apk`.
 
-### Or build locally
+> The extra step exists because the automation account that created this branch is not
+> permitted to write to `.github/workflows/`. The workflow is ready at
+> [`ci/android-build.yml`](ci/android-build.yml); the command above just moves it into place.
+> You can equally do it by hand: **Add file ▸ Create new file** ▸ name it
+> `.github/workflows/android-build.yml` ▸ paste that file's contents ▸ Commit.
+
+### Build it yourself instead
+
+If you have Android Studio (or a JDK 17 + Android SDK):
+
 ```bash
-./gradlew assembleRelease      # or: gradle assembleRelease
-# output: app/build/outputs/apk/release/
+./build-apk.sh
 ```
-Requires JDK 17 and the Android SDK (Android Studio Koala+ opens the project directly).
 
-**Installing:** enable *Install unknown apps* on the phone, then open the APK.
+This creates the signing key, runs the tests and writes `dist/VoltBillPro-release.apk`.
+The Gradle wrapper is committed, so nothing else needs installing.
+
+### Installing on the phone
+
+Copy the APK across, tap it, and allow *Install unknown apps* when Android asks.
 Min Android 7.0 (API 24), targets Android 14 (API 34).
-
----
 
 ## ✨ Features
 
