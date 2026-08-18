@@ -146,16 +146,16 @@ fun CustomerScreen(vm: AppViewModel, editing: Customer?, onEdit: (Customer?) -> 
 
 @Composable
 fun CustomerDialog(customer: Customer, onDismiss: () -> Unit, onSave: (Customer) -> Unit) {
-    var name by remember { mutableStateOf(customer.name) }
-    var phone by remember { mutableStateOf(customer.phone) }
-    var email by remember { mutableStateOf(customer.email) }
-    var gstin by remember { mutableStateOf(customer.gstin) }
-    var address by remember { mutableStateOf(customer.address) }
-    var city by remember { mutableStateOf(customer.city) }
-    var state by remember { mutableStateOf(customer.state) }
-    var stateCode by remember { mutableStateOf(customer.stateCode) }
-    var pincode by remember { mutableStateOf(customer.pincode) }
-    var type by remember { mutableStateOf(customer.type) }
+    var name by remember(customer.id) { mutableStateOf(customer.name) }
+    var phone by remember(customer.id) { mutableStateOf(customer.phone) }
+    var email by remember(customer.id) { mutableStateOf(customer.email) }
+    var gstin by remember(customer.id) { mutableStateOf(customer.gstin) }
+    var address by remember(customer.id) { mutableStateOf(customer.address) }
+    var city by remember(customer.id) { mutableStateOf(customer.city) }
+    var state by remember(customer.id) { mutableStateOf(customer.state) }
+    var stateCode by remember(customer.id) { mutableStateOf(customer.stateCode) }
+    var pincode by remember(customer.id) { mutableStateOf(customer.pincode) }
+    var type by remember(customer.id) { mutableStateOf(customer.type) }
 
     AlertDialog(
         onDismissRequest = onDismiss,

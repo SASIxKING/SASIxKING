@@ -118,7 +118,7 @@ fun WarrantyScreen(vm: AppViewModel) {
     }
 
     claiming?.let { w ->
-        var notes by remember { mutableStateOf(w.claimNotes) }
+        var notes by remember(w.id) { mutableStateOf(w.claimNotes) }
         AlertDialog(
             onDismissRequest = { claiming = null },
             title = { Text("Warranty — ${w.serial}") },

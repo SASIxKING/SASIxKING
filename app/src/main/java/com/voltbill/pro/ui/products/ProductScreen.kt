@@ -60,6 +60,7 @@ fun ProductScreen(vm: AppViewModel, editing: Product?, onEdit: (Product?) -> Uni
     val products by vm.products.collectAsStateWithLifecycle()
     val query by vm.productQuery.collectAsStateWithLifecycle()
     var category by remember { mutableStateOf("All") }
+
     var restocking by remember { mutableStateOf<Product?>(null) }
     var deleting by remember { mutableStateOf<Product?>(null) }
 
@@ -153,8 +154,8 @@ fun ProductScreen(vm: AppViewModel, editing: Product?, onEdit: (Product?) -> Uni
     }
 
     restocking?.let { p ->
-        var qty by remember { mutableStateOf("") }
-        var reason by remember { mutableStateOf("Purchase") }
+        var qty by remember(p.id) { mutableStateOf("") }
+        var reason by remember(p.id) { mutableStateOf("Purchase") }
         AlertDialog(
             onDismissRequest = { restocking = null },
             title = { Text("Add stock — ${p.name}") },
@@ -193,21 +194,21 @@ fun ProductScreen(vm: AppViewModel, editing: Product?, onEdit: (Product?) -> Uni
 
 @Composable
 fun ProductDialog(product: Product, onDismiss: () -> Unit, onSave: (Product) -> Unit) {
-    var name by remember { mutableStateOf(product.name) }
-    var category by remember { mutableStateOf(product.category) }
-    var brand by remember { mutableStateOf(product.brand) }
-    var model by remember { mutableStateOf(product.model) }
-    var hsn by remember { mutableStateOf(product.hsn) }
-    var unit by remember { mutableStateOf(product.unit) }
-    var capacity by remember { mutableStateOf(product.capacity) }
-    var purchase by remember { mutableStateOf(if (product.purchasePrice == 0.0) "" else trim(product.purchasePrice)) }
-    var selling by remember { mutableStateOf(if (product.sellingPrice == 0.0) "" else trim(product.sellingPrice)) }
-    var gst by remember { mutableStateOf(trim(product.gstRate)) }
-    var stock by remember { mutableStateOf(trim(product.stockQty)) }
-    var lowAlert by remember { mutableStateOf(trim(product.lowStockAlert)) }
-    var warranty by remember { mutableStateOf(product.warrantyMonths.toString()) }
-    var exchange by remember { mutableStateOf(trim(product.exchangeValue)) }
-    var trackSerial by remember { mutableStateOf(product.trackSerial) }
+    var name by remember(product.id) { mutableStateOf(product.name) }
+    var category by remember(product.id) { mutableStateOf(product.category) }
+    var brand by remember(product.id) { mutableStateOf(product.brand) }
+    var model by remember(product.id) { mutableStateOf(product.model) }
+    var hsn by remember(product.id) { mutableStateOf(product.hsn) }
+    var unit by remember(product.id) { mutableStateOf(product.unit) }
+    var capacity by remember(product.id) { mutableStateOf(product.capacity) }
+    var purchase by remember(product.id) { mutableStateOf(if (product.purchasePrice == 0.0) "" else trim(product.purchasePrice)) }
+    var selling by remember(product.id) { mutableStateOf(if (product.sellingPrice == 0.0) "" else trim(product.sellingPrice)) }
+    var gst by remember(product.id) { mutableStateOf(trim(product.gstRate)) }
+    var stock by remember(product.id) { mutableStateOf(trim(product.stockQty)) }
+    var lowAlert by remember(product.id) { mutableStateOf(trim(product.lowStockAlert)) }
+    var warranty by remember(product.id) { mutableStateOf(product.warrantyMonths.toString()) }
+    var exchange by remember(product.id) { mutableStateOf(trim(product.exchangeValue)) }
+    var trackSerial by remember(product.id) { mutableStateOf(product.trackSerial) }
 
     AlertDialog(
         onDismissRequest = onDismiss,

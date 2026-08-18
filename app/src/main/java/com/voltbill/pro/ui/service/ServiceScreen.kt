@@ -56,6 +56,7 @@ fun ServiceScreen(vm: AppViewModel, editing: ServiceJob?, onEdit: (ServiceJob?) 
     val customers by vm.customers.collectAsStateWithLifecycle()
     var status by remember { mutableStateOf("All") }
 
+
     val filtered = jobs.filter { status == "All" || it.status == status }
 
     Column(Modifier.fillMaxSize()) {
@@ -139,16 +140,17 @@ fun ServiceDialog(
     onSave: (ServiceJob) -> Unit,
     onDelete: () -> Unit
 ) {
-    var customerId by remember { mutableStateOf(job.customerId) }
-    var customerName by remember { mutableStateOf(job.customerName) }
-    var phone by remember { mutableStateOf(job.customerPhone) }
-    var address by remember { mutableStateOf(job.address) }
-    var type by remember { mutableStateOf(job.type) }
-    var desc by remember { mutableStateOf(job.description) }
-    var tech by remember { mutableStateOf(job.technician) }
-    var charges by remember { mutableStateOf(if (job.charges == 0.0) "" else trim(job.charges)) }
-    var status by remember { mutableStateOf(job.status) }
+    var customerId by remember(job.id) { mutableStateOf(job.customerId) }
+    var customerName by remember(job.id) { mutableStateOf(job.customerName) }
+    var phone by remember(job.id) { mutableStateOf(job.customerPhone) }
+    var address by remember(job.id) { mutableStateOf(job.address) }
+    var type by remember(job.id) { mutableStateOf(job.type) }
+    var desc by remember(job.id) { mutableStateOf(job.description) }
+    var tech by remember(job.id) { mutableStateOf(job.technician) }
+    var charges by remember(job.id) { mutableStateOf(if (job.charges == 0.0) "" else trim(job.charges)) }
+    var status by remember(job.id) { mutableStateOf(job.status) }
     var pickCustomer by remember { mutableStateOf(false) }
+
 
     AlertDialog(
         onDismissRequest = onDismiss,

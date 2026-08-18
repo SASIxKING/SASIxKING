@@ -286,7 +286,7 @@ fun InvoiceDetailScreen(vm: AppViewModel, invoiceId: Long, onBack: () -> Unit) {
 
     if (showPayment && inv != null) {
         val balance = money(inv.grandTotal - inv.paidAmount)
-        var amount by remember { mutableStateOf(trim(balance)) }
+        var amount by remember(inv.id, balance) { mutableStateOf(trim(balance)) }
         var mode by remember { mutableStateOf("Cash") }
         var ref by remember { mutableStateOf("") }
         AlertDialog(
