@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "main": "electron/main.cjs",
-  "description": "Billing, inventory and GST software for C.R.S Power Solution — inverters & batteries, Pondicherry",
+  "description": "Billing, inventory and GST software for C.R.S Power Solution \u2014 inverters & batteries, Pondicherry",
   "author": "C.R.S Power Solution",
   "scripts": {
     "dev": "concurrently -k -n API,WEB -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
@@ -14,14 +14,15 @@
     "preview": "vite preview",
     "start": "node server/index.js",
     "test": "node --test tests/*.test.js",
-    "build:embedded": "cross-env VITE_APP_TARGET=embedded vite build",
     "desktop:dev": "concurrently -k -n VITE,ELECTRON -c cyan,green \"npm:dev:web\" \"wait-on tcp:5173 && electron .\"",
-    "desktop:build": "npm run build:embedded && electron-builder --win --publish never",
-    "desktop:dir": "npm run build:embedded && electron-builder --win --dir --publish never",
-    "android:sync": "npm run build:embedded && cap sync android",
+    "desktop:build": "npm run build:windows && electron-builder --win --publish never",
+    "desktop:dir": "npm run build:windows && electron-builder --win --dir --publish never",
+    "android:sync": "npm run build:android && cap sync android",
     "android:open": "cap open android",
     "android:apk": "npm run android:sync && cd android && ./gradlew assembleRelease",
-    "android:debug": "npm run android:sync && cd android && ./gradlew assembleDebug"
+    "android:debug": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "build:android": "vite build",
+    "build:windows": "vite build"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -39,7 +40,6 @@
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.0.1",
-    "cross-env": "^7.0.3",
     "electron": "^31.4.0",
     "electron-builder": "^24.13.3",
     "postcss": "^8.4.47",
@@ -60,6 +60,7 @@
       "dist/**/*",
       "electron/main.cjs",
       "electron/preload.cjs",
+      "electron/icon.png",
       "package.json"
     ],
     "win": {

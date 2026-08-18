@@ -13,8 +13,23 @@ const API_PORT = process.env.API_PORT || 8787;
  *                          business core runs in-process with no server.
  */
 export default defineConfig(({ mode }) => {
-  const target = process.env.VITE_APP_TARGET || 'web';
+  // Resolve the build target from the env var, falling back to the npm script
+  // name (npm_lifecycle_event). Relying on cross-env alone is fragile: if it
+  // is unavailable the variable is silently dropped and we would ship a WEB
+  // bundle inside the desktop/mobile app, which then loads nothing from
+  // file:// and shows a blank window. Fail loudly instead of shipping that.
+  const script = process.env.npm_lifecycle_event || '';
+  const inferred =
+    process.env.VITE_APP_TARGET
+    || (/android/i.test(script) ? 'android' : '')
+    || (/desktop|windows|electron/i.test(script) ? 'windows' : '')
+    || (/embedded/i.test(script) ? 'embedded' : '')
+    || 'web';
+
+  const target = inferred;
   const embedded = target !== 'web';
+
+  console.log(`[vite] building target="${target}" (${embedded ? 'offline/embedded, relative asset paths' : 'web, served over HTTP'})`);
 
   return {
     plugins: [react()],

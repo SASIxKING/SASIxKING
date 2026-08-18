@@ -32,24 +32,60 @@ npm test          # 43 unit tests over the money, inventory and analytics rules
 npm run build     # production web bundle
 ```
 
-## Building the Android APK and Windows installer
+## Getting the app files (APK + Windows installer)
+
+Both installers are produced by GitHub Actions — nothing to install on your
+machine:
 
 ```bash
-./build-apps.sh --ci        # build BOTH on GitHub Actions — nothing to install
-./build-apps.sh android     # APK locally      (needs JDK 17 + Android SDK)
-./build-apps.sh windows     # .exe — must run ON Windows (or Linux + wine)
+cd crs-power-billing
+./build-apps.sh --ci
 ```
 
-`--ci` copies `ci/build-apps.yml` into `.github/workflows/`, commits and pushes.
-The run produces two downloadable artifacts:
+That enables the workflow, commits and pushes it. About 5–8 minutes later, open
+[the Actions tab](https://github.com/SASIxKING/SASIxKING/actions), click the
+finished run and download from **Artifacts**:
 
-- **CRS-Power-Billing-Android** → `app-release.apk` (signed, sideloadable)
-- **CRS-Power-Billing-Windows** → `CRS-Power-Billing-Setup-1.0.0.exe` plus a
-  portable `.exe` that runs from a pen drive with no installation
+| Artifact | Contains | Use |
+|---|---|---|
+| **CRS-Power-Billing-Android** | `app-release.apk`, `app-debug.apk` | install on the phone/tablet |
+| **CRS-Power-Billing-Windows** | `CRS-Power-Billing-Setup-1.0.0.exe`, portable `.exe` | install on the shop PC |
 
-> The workflow lives in `ci/` rather than `.github/workflows/` because the
-> automation account that created this branch is not allowed to write there.
-> You can also just create the file by hand in the GitHub web UI.
+> The workflow sits in `ci/build-apps.yml` rather than `.github/workflows/`
+> because the automation account that created this branch is blocked from
+> writing there. The command above just moves it. You can equally create the
+> file by hand in the GitHub web UI and paste the contents in.
+
+### Saving the APK to the phone
+
+1. Download **CRS-Power-Billing-Android** on the phone (or copy it across by
+   USB/WhatsApp). The zip contains `app-release.apk`.
+2. Unzip and tap `app-release.apk`.
+3. Android will ask to allow installs from that app (Chrome / Files) — allow it,
+   then tap **Install**.
+4. Open **CRS Power Billing**. It works with mobile data and Wi-Fi switched off;
+   the invoices live on the phone.
+
+The APK is signed with a key generated during the build, which is fine for
+sideloading. For the Play Store, or to keep upgrades installing over the top of
+each other, generate your own keystore once and store it as repository secrets.
+
+### Installing on Windows
+
+Run `CRS-Power-Billing-Setup-1.0.0.exe` and follow the prompts (it installs per
+user, so no admin rights are needed). SmartScreen may warn that the publisher is
+unknown — that is expected for an unsigned app; choose **More info ▸ Run anyway**.
+A code-signing certificate removes that warning.
+
+Prefer no installation? Use the portable `.exe` straight from a pen drive.
+
+### Building locally instead
+
+```bash
+./build-apps.sh android     # needs JDK 17 + Android SDK
+./build-apps.sh windows     # must be run ON Windows (or Linux + wine)
+./build-apps.sh web         # hosted version
+```
 
 ### Desktop development
 

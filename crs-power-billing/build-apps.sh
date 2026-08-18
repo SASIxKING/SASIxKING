@@ -57,7 +57,7 @@ case "$TARGET" in
     npm test
 
     banner "Building offline web bundle"
-    npx cross-env VITE_APP_TARGET=android vite build
+    npm run build:android
 
     banner "Syncing the Android project"
     npx cap sync android
@@ -95,7 +95,7 @@ case "$TARGET" in
     npm test
 
     banner "Building offline web bundle"
-    npx cross-env VITE_APP_TARGET=windows vite build
+    npm run build:windows
 
     banner "Packaging the Windows app"
     npx electron-builder --win --publish never
