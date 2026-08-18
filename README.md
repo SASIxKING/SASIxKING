@@ -60,6 +60,9 @@ Min Android 7.0 (API 24), targets Android 14 (API 34).
 - Payment modes: Cash / UPI / Card / Bank / Credit
 
 ### A4 PDF invoices
+
+![Tax invoice preview](docs/invoice-preview.png)
+
 Generated with the native `PdfDocument` API — branded header, bill-to/invoice-details panels,
 itemised table with **serial numbers and warranty per line**, tax summary by HSN, bank + UPI
 details, T&C and signature block. **Share straight to WhatsApp**, email or Drive.
@@ -116,8 +119,9 @@ app/src/main/java/com/voltbill/pro/
 Single-Activity Compose app, `AppViewModel` exposing Room `Flow`s as `StateFlow`,
 navigation-compose for routing. No network permission is used for business data.
 
-The GST calculations (CGST/SGST split, IGST, discounts, round-off and the Indian
-number-to-words conversion) were verified against an independent reference implementation.
+The GST engine is covered by unit tests (`app/src/test/.../GstEngineTest.kt`) that run in CI
+before the APK is assembled: CGST/SGST split, IGST, line discounts, exchange deduction,
+round-off, Indian digit grouping, amount-in-words, invoice numbering and warranty date maths.
 
 ---
 

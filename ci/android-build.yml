@@ -41,6 +41,9 @@ jobs:
             -storepass voltbill -keypass voltbill \
             -dname "CN=VoltBill Pro, OU=Sales, O=VoltBill, L=Puducherry, S=Puducherry, C=IN"
 
+      - name: Run GST engine unit tests
+        run: gradle :app:testDebugUnitTest --no-daemon
+
       - name: Build debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace
 
